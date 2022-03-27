@@ -14,15 +14,13 @@ function Square (props) {
 
 function Board (props) {
 
-    const [squares, setSquares] = useState(Array(9).fill(null));
-
     function handleClick(i) {
-        const squaresArray = squares.slice();
-        if (squares[i] !== null) {
+        const squaresArray = props.squares.slice();
+        if (props.squares[i] !== null) {
             return alert('case déjà jouée, choisissez une autre');
         }
         squaresArray[i] =  props.player === 'player1' ? 'X' : 'O';
-        setSquares(squaresArray);
+        props.setSquares(squaresArray);
         props.setPlayer(props.player === 'player1' ? 'player2' : 'player1');
     }
 
@@ -39,9 +37,9 @@ function Board (props) {
         ];
         for (let i = 0; i < lines.length; i++) {
             const [a, b, c] = lines[i];
-            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                squares[a] === 'O' && props.setWinner('player1');
-                squares[a] === 'X' && props.setWinner('player2');
+            if (props.squares[a] && props.squares[a] === props.squares[b] && props.squares[a] === props.squares[c]) {
+                props.squares[a] === 'O' && props.setWinner('player1');
+                props.squares[a] === 'X' && props.setWinner('player2');
             }
         }
     
@@ -49,7 +47,7 @@ function Board (props) {
     
     useEffect(() => {
         console.log('reset');
-        setSquares(Array(9).fill(null));
+        props.setSquares(Array(9).fill(null));
         props.setWinner('');
         props.setReset(false);
         props.setPlayer('player2');
@@ -58,10 +56,10 @@ function Board (props) {
 
     return(
         <>
-            {squares.map((item,index) => {
+            {props.squares.map((item,index) => {
                 return (
                     <Square 
-                        value={squares[index]} 
+                        value={props.squares[index]} 
                         onClick={() => handleClick(index)}
                         key={uuidV4()} />
                 )
@@ -74,6 +72,7 @@ export default function Morpion () {
     const [player, setPlayer] = useState('player2');
     const [winner, setWinner] = useState('');
     const [reset, setReset] = useState(false);
+    const [squares, setSquares] = useState(Array(9).fill(null));
 
     function onChange () {
         setReset(true);
@@ -89,11 +88,14 @@ export default function Morpion () {
                 setWinner={setWinner}
                 reset={reset}
                 setReset={setReset}
+                squares={squares}
+                setSquares={setSquares}
                  />
             </div>
             <p>Prochain tour : {player === 'player1' ? 'player2' : 'player1'}</p>
             {winner !== '' && <p className='flashing-text'>Le gagnant est {winner}</p>}
-            {winner !== '' && <button onClick={() => onChange()}>reset</button>}
+            {(winner === '' && !squares.includes(null)) && <p>Pas de gagnant...</p>}
+            {(winner !== '' || !squares.includes(null)) && <button onClick={() => onChange()}>reset</button>}
         </div>
     )
 }
