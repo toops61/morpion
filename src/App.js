@@ -1,10 +1,13 @@
 import './App.css';
+import ThemeContextProvider from './Context/ThemeContext';
 import Morpion from './Morpion/Morpion';
 
 function App() {
   return (
     <div className="App">
-      <Morpion />
+      <ThemeContextProvider>
+        <Morpion />
+      </ThemeContextProvider>
     </div>
   );
 }

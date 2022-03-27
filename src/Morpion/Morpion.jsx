@@ -1,6 +1,7 @@
-import React from 'react';
-import { useState,useEffect } from "react";
+import React, { useContext } from 'react';
+import { useEffect } from "react";
 import {v4 as uuidV4} from 'uuid';
+import { ThemeContext } from '../Context/ThemeContext';
 import './Morpion.css';
 
 function Square (props) {
@@ -12,16 +13,18 @@ function Square (props) {
         )
 }
 
-function Board (props) {
+function Board () {
+
+    const {squares,setSquares,player,setPlayer,setWinner,reset,setReset} = useContext(ThemeContext);
 
     function handleClick(i) {
-        const squaresArray = props.squares.slice();
-        if (props.squares[i] !== null) {
+        const squaresArray = squares.slice();
+        if (squares[i] !== null) {
             return alert('case déjà jouée, choisissez une autre');
         }
-        squaresArray[i] =  props.player === 'player1' ? 'X' : 'O';
-        props.setSquares(squaresArray);
-        props.setPlayer(props.player === 'player1' ? 'player2' : 'player1');
+        squaresArray[i] =  player === 'player1' ? 'X' : 'O';
+        setSquares(squaresArray);
+        setPlayer(player === 'player1' ? 'player2' : 'player1');
     }
 
     useEffect(() => {
@@ -37,9 +40,9 @@ function Board (props) {
         ];
         for (let i = 0; i < lines.length; i++) {
             const [a, b, c] = lines[i];
-            if (props.squares[a] && props.squares[a] === props.squares[b] && props.squares[a] === props.squares[c]) {
-                props.squares[a] === 'O' && props.setWinner('player1');
-                props.squares[a] === 'X' && props.setWinner('player2');
+            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+                squares[a] === 'O' && setWinner('player1');
+                squares[a] === 'X' && setWinner('player2');
             }
         }
     
@@ -47,19 +50,19 @@ function Board (props) {
     
     useEffect(() => {
         console.log('reset');
-        props.setSquares(Array(9).fill(null));
-        props.setWinner('');
-        props.setReset(false);
-        props.setPlayer('player2');
-    }, [props.reset])
+        setSquares(Array(9).fill(null));
+        setWinner('');
+        setReset(false);
+        setPlayer('player2');
+    }, [reset])
     
 
     return(
         <>
-            {props.squares.map((item,index) => {
+            {squares.map((item,index) => {
                 return (
                     <Square 
-                        value={props.squares[index]} 
+                        value={squares[index]} 
                         onClick={() => handleClick(index)}
                         key={uuidV4()} />
                 )
@@ -69,10 +72,8 @@ function Board (props) {
 }
 
 export default function Morpion () {
-    const [player, setPlayer] = useState('player2');
-    const [winner, setWinner] = useState('');
-    const [reset, setReset] = useState(false);
-    const [squares, setSquares] = useState(Array(9).fill(null));
+
+    const {setReset,winner,player,squares} = useContext(ThemeContext);
 
     function onChange () {
         setReset(true);
@@ -81,16 +82,7 @@ export default function Morpion () {
     return (
         <div className="morpion-container">
             <div className="morpion-board">
-                <Board 
-                player={player}
-                setPlayer={setPlayer}
-                winner={winner}
-                setWinner={setWinner}
-                reset={reset}
-                setReset={setReset}
-                squares={squares}
-                setSquares={setSquares}
-                 />
+                <Board />
             </div>
             <p>Prochain tour : {player === 'player1' ? 'player2' : 'player1'}</p>
             {winner !== '' && <p className='flashing-text'>Le gagnant est {winner}</p>}
